@@ -19,6 +19,7 @@ services:
     volumes:
       - ./api:/go/src/github.com/user/dthought/api
     ports:
+      # outer:inner
       - "5000:8080"
     links:
       - db

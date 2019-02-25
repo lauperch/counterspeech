@@ -1,13 +1,10 @@
 {
-  "name": "livy_frontend",
+  "name": "wip_frontend",
   "version": "0.1.0",
   "dependencies": {
-    "axios": "^0.15.3",
-    "react": "^15.4.2",
-    "react-bootstrap": "^0.30.7",
-    "react-dom": "^15.4.2",
-    "react-router": "^3.0.2",
-    "react-scripts": "0.9.0"
+    "react": "^16.8.3",
+    "react-dom": "^16.8.3",
+    "react-scripts": "2.1.5"
   },
   "scripts": {
     "start": "react-scripts start",
