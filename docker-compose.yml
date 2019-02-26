@@ -33,3 +33,11 @@ services:
       - ./frontend/src:/frontend/src 
     ports:
       - "3000:3000"
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - ./mongo/db:/mongo/db
+    ports:
+      - "27017:27017"
