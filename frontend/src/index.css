@@ -4,6 +4,11 @@ body {
     font-family: sans-serif;
   }
   
+  h1 {
+    color: white;
+    font-family: 'Roboto', sans-serif;
+  }
+  
   #container {
     display: flex;
     justify-content: center;
@@ -15,6 +20,7 @@ body {
     font-size: 16px;
     border: 2px solid #FFF;
     width: 165px;
+    font-family: 'Roboto', sans-serif;
   }
   
   .todoListMain .header button {
@@ -25,6 +31,7 @@ body {
     background-color:	#008080;
     color: #FFF;
     border: 2px solid #004040;
+    font-family: 'Roboto', sans-serif;
   }
   
   .todoListMain .header button:hover {
@@ -65,6 +72,7 @@ body {
     margin-bottom: 15px;
     border-radius: 5px;
     transition: background-color .2s ease-out;
+    font-family: 'Roboto', sans-serif;
   }
   
   .todoListMain .theList li:hover {

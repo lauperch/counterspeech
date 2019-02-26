@@ -1,57 +1,62 @@
 import React, { Component } from 'react'
 import './App.css'
 import TodoList from './TodoList'
-import TodoItems from './TodoItems'
+import TodoElements from './TodoElements'
 
 class App extends Component {
   inputElement = React.createRef()
+  
   constructor() {
     super()
     this.state = {
-      items: [],
-      currentItem: {
+      elements: [],
+      currentElement: {
         text: '',
         key: '',
       },
     }
   }
-  deleteItem = key => {
-    const filteredItems = this.state.items.filter(item => {
-      return item.key !== key
+
+  deleteElement = key => {
+    const filteredelements = this.state.elements.filter(element => {
+      return element.key !== key
     })
     this.setState({
-      items: filteredItems,
+      elements: filteredelements,
     })
   }
 
   handleInput = e => {
-    const itemText = e.target.value
-    const currentItem = { text: itemText, key: Date.now() }
+    const elementText = e.target.value
+    const currentElement = { text: elementText, key: Date.now() }
     this.setState({
-      currentItem,
+      currentElement,
     })
   }
-  addItem = e => {
+
+  addElement = e => {
     e.preventDefault()
-    const newItem = this.state.currentItem
-    if (newItem.text !== '') {
-      const items = [...this.state.items, newItem]
+    const newElement = this.state.currentElement
+    if (newElement.text !== '') {
+      const elements = [...this.state.elements, newElement]
       this.setState({
-        items: items,
-        currentItem: { text: '', key: '' },
+        elements: elements,
+        currentElement: { text: '', key: '' },
       })
     }
   }
+
   render() {
     return (
       <div className="App">
+        <h1>TODO</h1>
         <TodoList
-          addItem={this.addItem}
+          addElement={this.addElement}
           inputElement={this.inputElement}
           handleInput={this.handleInput}
-          currentItem={this.state.currentItem}
+          currentElement={this.state.currentElement}
         />
-        <TodoItems entries={this.state.items} deleteItem={this.deleteItem} />
+        <TodoElements entries={this.state.elements} deleteElement={this.deleteElement} />
       </div>
     )
   }

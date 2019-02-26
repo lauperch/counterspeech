@@ -16,10 +16,12 @@
 
 .App-title {
   font-size: 1.5em;
+  font-family: 'Roboto', sans-serif;
 }
 
 .App-intro {
   font-size: large;
+  font-family: 'Roboto', sans-serif;
 }
 
 @keyframes App-logo-spin {
