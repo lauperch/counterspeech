@@ -8,17 +8,6 @@ services:
     ports:
       - "27017:27017"
 
-  db:
-    build: ./db
-    volumes:
-      - ./db/pgdata:/pgdata
-    ports:
-      - "5432"
-    environment:
-      - POSTGRES_USER=docker
-      - POSTGRES_PASSWORD=docker
-      - PGDATA=/pgdata
-
   api:
     build:
       context: ./api
@@ -30,7 +19,6 @@ services:
       # outer:inner
       - "5000:8080"
     links:
-      - db
       - mongo
     depends_on:
       - 'mongo'
