@@ -17,6 +17,7 @@ var texts *mgo.Collection
 type Text struct {
 	Content string
 	URL     string
+	Source  string
 }
 
 func submit(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
