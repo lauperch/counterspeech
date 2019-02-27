@@ -139,13 +139,13 @@ func main() {
 	router.OPTIONS("/*any", corsHandler)
 
 	// add database
-	_, err := database.Init()
+	session, err := database.Init()
 	if err != nil {
-		log.Println("connection to DB failed, aborting...")
+		log.Println("connection to mongodb failed, aborting...")
 		log.Fatal(err)
 	}
 
-	log.Println("connected to DB")
+	log.Println("connected to mongodb")
 
 	// print env
 	env := os.Getenv("APP_ENV")

@@ -5,58 +5,22 @@ It does not contain actual business logic yet
 
 package database
 
-import (
-	"time"
-
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-)
-
-var DB *gorm.DB
-var err error
+var session *mgo.Session
 
 type Post struct {
-	gorm.Model
-	Author  string
-	Message string
+	URL  string
+	Text string
 }
 
-func addDatabase(dbname string) error {
-	// create database with dbname, won't do anything if db already exists
-	DB.Exec("CREATE DATABASE " + dbname)
-
-	// connect to newly created DB (now has dbname param)
-	connectionParams := "dbname=" + dbname + " user=docker password=docker sslmode=disable host=db"
-	DB, err = gorm.Open("postgres", connectionParams)
+func Init() {
+	session, err := mgo.Dial("localhost")
 	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func Init() (*gorm.DB, error) {
-	// set up DB connection and then attempt to connect 5 times over 25 seconds
-	connectionParams := "user=docker password=docker sslmode=disable host=db"
-	for i := 0; i < 5; i++ {
-		DB, err = gorm.Open("postgres", connectionParams) // gorm checks Ping on Open
-		if err == nil {
-			break
-		}
-		time.Sleep(5 * time.Second)
+		panic(err)
 	}
 
 	if err != nil {
 		return DB, err
 	}
 
-	// create table if it does not exist
-	if !DB.HasTable(&Post{}) {
-		DB.CreateTable(&Post{})
-	}
-
-	testPost := Post{Author: "watabo", Message: "test"}
-	DB.Create(&testPost)
-
-	return DB, err
+	return session, err
 }
