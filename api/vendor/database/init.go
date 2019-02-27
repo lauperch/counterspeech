@@ -5,22 +5,32 @@ It does not contain actual business logic yet
 
 package database
 
-var session *mgo.Session
+import (
+	"time"
+
+	"gopkg.in/mgo.v2"
+)
+
+var Session *mgo.Session
+var err error
 
 type Post struct {
 	URL  string
 	Text string
 }
 
-func Init() {
-	session, err := mgo.Dial("localhost")
+func Init() (*mgo.Session, error) {
+	for i := 0; i < 5; i++ {
+		Session, err = mgo.Dial("mongo:27017")
+		if err == nil {
+			break
+		}
+		time.Sleep(5 * time.Second)
+	}
+
 	if err != nil {
 		panic(err)
 	}
 
-	if err != nil {
-		return DB, err
-	}
-
-	return session, err
+	return Session, err
 }

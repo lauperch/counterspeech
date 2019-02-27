@@ -2,101 +2,44 @@ package main
 
 import (
 	"database"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/julienschmidt/httprouter"
+	"gopkg.in/mgo.v2/bson"
 )
 
-// CRUD Route Handlers
-func createPostHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	setCors(w)
-	decoder := json.NewDecoder(r.Body)
-	var newPost database.Post
-	if err := decoder.Decode(&newPost); err != nil {
-		http.Error(w, err.Error(), 400)
-		return
-	}
-
-	database.DB.Create(&newPost)
-	res, err := json.Marshal(newPost)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
-	w.Write(res)
-}
-
-func deletePostHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	setCors(w)
-	var deletedPost database.Post
-	database.DB.Where("ID = ?", ps.ByName("postId")).Delete(&deletedPost) // write now this returns a blank item not the deleted item
-	res, err := json.Marshal(deletedPost)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-	}
-
-	w.Write(res)
-}
-
-func updatePostHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	setCors(w)
-	type body struct {
-		Author  string
-		Message string
-	}
-	var updates body
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&updates); err != nil {
-		http.Error(w, err.Error(), 400)
-	}
-
-	var updatedPost database.Post
-	database.DB.Where("ID = ?", ps.ByName("postId")).First(&updatedPost)
-	updatedPost.Author = updates.Author
-	updatedPost.Message = updates.Message
-	database.DB.Save(&updatedPost)
-	res, err := json.Marshal(updatedPost)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-	}
-
-	w.Write(res)
-}
-
-func showPostHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	setCors(w)
-	var post database.Post
-	database.DB.Where("ID = ?", ps.ByName("postId")).First(&post)
-	res, err := json.Marshal(post)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
-	w.Write(res)
-}
-
-func indexPostHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	setCors(w)
-	var posts []database.Post
-	database.DB.Find(&posts)
-	res, err := json.Marshal(posts)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
-	w.Write(res)
+type Text struct {
+	Content string
+	URL     string
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	setCors(w)
-	fmt.Fprintf(w, "This is the RESTful api")
+	mySession := database.Session.Copy()
+	defer mySession.Close()
+
+	c := mySession.DB("test").C("myCollection")
+
+	err := c.Insert(
+		&Text{"Lorem Ipsum", "http://a.com"},
+		&Text{"Dolor", "http://b.com"})
+
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	result := Text{}
+	err = c.Find(bson.M{"url": "http://b.com"}).One(&result)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	fmt.Fprintf(w, result.Content)
 }
 
 // used for COR preflight checks
@@ -126,20 +69,14 @@ func Canary(word string) string {
 }
 
 func main() {
-	defer database.DB.Close()
+	// add database
+	session, err := database.Init()
+	defer session.Close()
 
 	// add router and routes
 	router := httprouter.New()
 	router.GET("/", indexHandler)
-	router.POST("/posts", createPostHandler)
-	router.GET("/posts/:postId", showPostHandler)
-	router.DELETE("/posts/:postId", deletePostHandler)
-	router.PUT("/posts/:postId", updatePostHandler)
-	router.GET("/posts", indexPostHandler)
-	router.OPTIONS("/*any", corsHandler)
 
-	// add database
-	session, err := database.Init()
 	if err != nil {
 		log.Println("connection to mongodb failed, aborting...")
 		log.Fatal(err)

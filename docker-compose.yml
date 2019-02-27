@@ -1,5 +1,13 @@
 version: '2'
 services:
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - ./mongo/db:/mongo/db
+    ports:
+      - "27017:27017"
+
   db:
     build: ./db
     volumes:
@@ -23,6 +31,9 @@ services:
       - "5000:8080"
     links:
       - db
+      - mongo
+    depends_on:
+      - 'mongo'
 
   frontend:
     build:
@@ -33,11 +44,3 @@ services:
       - ./frontend/src:/frontend/src 
     ports:
       - "3000:3000"
-
-  mongo:
-    container_name: mongo
-    image: mongo
-    volumes:
-      - ./mongo/db:/mongo/db
-    ports:
-      - "27017:27017"
