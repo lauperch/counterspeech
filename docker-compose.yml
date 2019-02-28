@@ -23,6 +23,16 @@ services:
     depends_on:
       - 'mongo'
 
+  coverpage:
+    build:
+      context: ./coverpage
+      args:
+        app_env: ${APP_ENV}
+    volumes:
+      - ./coverpage:/coverpage 
+    ports:
+      - "8080:8080"
+
   frontend:
     build:
       context: ./frontend
@@ -32,3 +42,4 @@ services:
       - ./frontend/src:/frontend/src 
     ports:
       - "3000:3000"
+

@@ -1,0 +1,13 @@
+{
+  "name": "coverpage",
+  "version": "1.0.0",
+  "description": "lonelycode coverpage",
+  "scripts": {
+    "main": "node server.js"
+  },
+  "author": "christoph lauper",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
