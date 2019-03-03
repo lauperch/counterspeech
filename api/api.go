@@ -10,6 +10,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"gopkg.in/mgo.v2"
+	"labix.org/v2/mgo/bson"
 )
 
 var texts *mgo.Collection
@@ -18,6 +19,9 @@ type Text struct {
 	Content string
 	URL     string
 	Source  string
+	IsHS    bool
+	IsNotHS bool
+	Idk     bool
 }
 
 func submit(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -57,23 +61,26 @@ func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	responseJSON(w, result)
 }
 
+func random(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	setCors(w)
+
+	pipe := texts.Pipe([]bson.M{{"$sample": bson.M{"size": 1}}})
+	result := []bson.M{}
+	err := pipe.All(&result)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	responseJSON(w, result)
+}
+
 // used for COR preflight checks
 func corsHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	setCors(w)
 }
 
-// util
-func getFrontendUrl() string {
-	if os.Getenv("APP_ENV") == "prod" {
-		return "http://localhost:3000" // change this to prod domain
-	} else {
-		return "http://localhost:3000"
-	}
-}
-
 func setCors(w http.ResponseWriter) {
-	frontendUrl := getFrontendUrl()
-	w.Header().Set("Access-Control-Allow-Origin", frontendUrl)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 }
@@ -89,11 +96,6 @@ func responseError(w http.ResponseWriter, message string, code int) {
 	json.NewEncoder(w).Encode(map[string]string{"error": message})
 }
 
-// Temporary Canary test to make sure Travis-CI is working
-func Canary(word string) string {
-	return word
-}
-
 func main() {
 	session, err := database.Init()
 	defer session.Close()
@@ -102,6 +104,7 @@ func main() {
 
 	router := httprouter.New()
 	router.GET("/", index)
+	router.GET("/random", random)
 	router.POST("/submit", submit)
 
 	if err != nil {

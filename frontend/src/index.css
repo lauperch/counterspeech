@@ -1,6 +1,6 @@
 body {
     padding: 50px;
-    background-color: #008080;
+    background-color: #ff4949;
     font-family: sans-serif;
   }
   
@@ -14,68 +14,42 @@ body {
     justify-content: center;
     flex-direction: column-reverse;
   }
+
+  .submit {
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    color: white;
+  }
   
-  .todoListMain .header input {
+  p {
+    color: white;
+  }
+  
+  .reportForm .header textarea {
     padding: 10px;
     font-size: 16px;
     border: 2px solid #FFF;
-    width: 165px;
+    width: 100%;
     font-family: 'Roboto', sans-serif;
+    height: 25em;
   }
   
-  .todoListMain .header button {
+  .reportForm .header button {
     padding: 10px;
     font-size: 16px;
     margin: 10px;
     margin-right: 0px;
-    background-color:	#008080;
+    background-color:	#ff4949;
     color: #FFF;
-    border: 2px solid #004040;
+    border: 2px solid #7e2323;
     font-family: 'Roboto', sans-serif;
   }
   
-  .todoListMain .header button:hover {
-    background-color: #004040;
-    border: 2px solid #008080;
-    cursor: pointer;
-  }
-  
-  .todoListMain .theList {
-    list-style: none;
-    color: #800000;
-    padding-left: 0;
-    width: 250px;
-  }
-  
-  .todoListMain .theList li {
-    color: #333;
-    background-color: #400000;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    list-style: none;
-  }
-  
-  ul.theList {
-    padding: 0;
-    list-style: none;
-    display: inline-flex;
-    justify-content: center;
-    flex-direction: column-reverse;
-  }
-  
-  
-  .theList li {
-    color: white;
-    background-color: #004040;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    transition: background-color .2s ease-out;
-    font-family: 'Roboto', sans-serif;
-  }
-  
-  .todoListMain .theList li:hover {
-    background-color: pink;
+  .reportForm .header button:hover {
+    background-color: #7e2323;
+    border: 2px solid #ff4949;
     cursor: pointer;
   }
