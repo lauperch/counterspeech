@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 	"io/ioutil"
@@ -27,36 +28,59 @@ type Source struct {
 // TODO global map is not v nice ;)
 var sources = map[string]Source{}
 
-const allowedDomains = [1]string{"20min.ch"}
+var pages = []string{"www.20min.ch"}
 
 func Status(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	setCors(w)
 	domain := ps.ByName("domain")
-	responseJSON(w, "")
+	if !contains(pages, domain) {
+		responseJSON(w, "domain not yet implemented")
+	} else if sources[domain].isRunning {
+		responseJSON(w, "source "+domain+" is running")
+	} else {
+		responseJSON(w, "source "+domain+" is not running")
+	}
 }
 
 func Run(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	setCors(w)
 	domain := ps.ByName("runDomain")
-	if contains(allowedDomains, domain) {
+	if !contains(pages, domain) {
 		responseJSON(w, "domain not yet implemented")
+	} else if sources[domain].isRunning {
+		responseJSON(w, "source"+domain+" already running")
+	} else {
+		startUrl := r.URL.Query().Get("startUrl")
+		src := Source{domain: domain, startUrl: startUrl}
+		go Scrape(src)
+		src.isRunning = true
+		sources[domain] = src
+		responseJSON(w, "started scraping "+domain+" on url "+startUrl)
 	}
-	if sources[domain] != nil && sources["domain"].isRunning {
-		responseJSON(w, "source already running")
-	}
-	src := Source{domain: domain}
-	go Scrape(src)
-	responseJSON(w, "")
 }
 
 func Stop(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	setCors(w)
 	domain := ps.ByName("stopDomain")
-	responseJSON(w, "")
+	if !contains(pages, domain) {
+		responseJSON(w, "domain not yet implemented")
+	} else if !sources[domain].isRunning {
+		responseJSON(w, "source"+domain+" already stopped")
+	} else {
+		src := sources[domain]
+		src.isRunning = false
+		sources[domain] = src
+		responseJSON(w, "stopped scraping "+domain)
+	}
 }
 
 func Scrape(src Source) {
-
+	startUrlHtml, err := GetHtml(src.startUrl)
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		log.Println(startUrlHtml)
+	}
 }
 
 func NextUrl(prevUrl string) string {
@@ -66,23 +90,24 @@ func NextUrl(prevUrl string) string {
 
 func HtmlToText(html string) Text {
 	// TODO implement
-	return nil
+	return Text{}
 }
 
 func Save(text Text) {
 	url := ""
 	if os.Getenv("APP_ENV") == "prod" {
-		url := "" // TODO insert correct prod url
+		url = "" // TODO insert correct prod url
 	} else {
-		url := "http://localhost:5000"
+		url = "http://localhost:5000"
 	}
-	resp, err := http.Post(url, "application/json", json.Marshal(text))
+	textJson, _ := json.Marshal(text)
+	_, err := http.Post(url, "application/json", bytes.NewBuffer(textJson))
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 }
 
-func MakeRequest(url string) (string, error) {
+func GetHtml(url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err

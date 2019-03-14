@@ -119,7 +119,7 @@ func main() {
 	router.GET("/", Index)
 	router.GET("/random", Random)
 	router.POST("/submit", Submit)
-	router.Delete("/remove/:id", Remove)
+	router.DELETE("/remove/:id", Remove)
 
 	env := os.Getenv("APP_ENV")
 	if env == "prod" {
