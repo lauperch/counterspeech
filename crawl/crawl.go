@@ -83,12 +83,12 @@ func Scrape(src Source) {
 	}
 }
 
-func NextUrl(prevUrl string) string {
+func GetCommentLinks(html string) []string {
 	// TODO implement
-	return ""
+	return []string{}
 }
 
-func HtmlToText(html string) Text {
+func CommentUrlHtmlToText(html string) Text {
 	// TODO implement
 	return Text{}
 }
