@@ -52,7 +52,7 @@ func Run(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	} else {
 		startUrl := r.URL.Query().Get("startUrl")
 		src := Source{domain: domain, startUrl: startUrl}
-		go Scrape(src)
+		go scrape(src)
 		src.isRunning = true
 		sources[domain] = src
 		responseJSON(w, "started scraping "+domain+" on url "+startUrl)
@@ -67,6 +67,7 @@ func Stop(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	} else if !sources[domain].isRunning {
 		responseJSON(w, "source"+domain+" already stopped")
 	} else {
+		// TODO get channel to src, send msg to src to stop
 		src := sources[domain]
 		src.isRunning = false
 		sources[domain] = src
@@ -74,26 +75,38 @@ func Stop(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 }
 
-func Scrape(src Source) {
+func scrape(src Source) {
 	startUrlHtml, err := GetHtml(src.startUrl)
 	if err != nil {
 		log.Fatal(err)
-	} else {
-		log.Println(startUrlHtml)
+		return
+	}
+	commentLinks, err := getCommentLinks(startUrlHtml)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	c := make(chan Text)
+	for _, link := range commentLinks {
+		go htmlToText(link, c)
+	}
+
+	for text := range c {
+		go save(text)
 	}
 }
 
-func GetCommentLinks(html string) []string {
+func getCommentLinks(html string) ([]string, error) {
 	// TODO implement
-	return []string{}
+	return []string{}, nil
 }
 
-func CommentUrlHtmlToText(html string) Text {
+func htmlToText(html string, c chan Text) Text {
 	// TODO implement
 	return Text{}
 }
 
-func Save(text Text) {
+func save(text Text) {
 	url := ""
 	if os.Getenv("APP_ENV") == "prod" {
 		url = "" // TODO insert correct prod url
