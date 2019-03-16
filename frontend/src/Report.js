@@ -27,7 +27,7 @@ class Report extends Component {
     console.log('adding', newElement)
 
     let url = ""
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'prod') {
       url = 'http://35.198.123.101:5000/submit';
     } else {
       url = 'http://localhost:5000/submit';
