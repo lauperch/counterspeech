@@ -27,6 +27,24 @@ body {
   p {
     color: white;
   }
+
+  a{
+      color: white;
+  }
+
+  a:hover{
+      color: white;
+  }
+  
+  button{
+    width:50%;
+    margin-left:25%;
+    background-color: #7e2323;
+    border: 2px solid #ff4949;
+    cursor: pointer;
+
+  }
+
   
   .reportForm .header textarea {
     padding: 10px;
@@ -40,7 +58,6 @@ body {
   .reportForm .header button {
     padding: 10px;
     font-size: 16px;
-    margin: 10px;
     margin-right: 0px;
     background-color:	#ff4949;
     color: #FFF;

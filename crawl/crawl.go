@@ -3,11 +3,14 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"regexp"
+	"strings"
 )
 
 type Text struct {
@@ -76,16 +79,12 @@ func Stop(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 func scrape(src Source) {
-	startUrlHtml, err := GetHtml(src.startUrl)
+	startUrlHtml, err := getHtml(src.startUrl)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	commentLinks, err := getCommentLinks(startUrlHtml)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	commentLinks := getCommentLinks(startUrlHtml)
 	c := make(chan Text)
 	for _, link := range commentLinks {
 		go htmlToText(link, c)
@@ -96,14 +95,42 @@ func scrape(src Source) {
 	}
 }
 
-func getCommentLinks(html string) ([]string, error) {
-	// TODO implement
-	return []string{}, nil
+func getCommentLinks(html string) []string {
+	re := regexp.MustCompile(`h3.*data-vr-contentbox.*\/.*"`)
+	linkStrings := re.FindAllString(html, -1)
+	var links []string
+	for _, linkString := range linkStrings {
+		parts := strings.Split(linkString, " ")
+		if len(parts) == 6 {
+			link := strings.Replace(parts[3], `"><a`, "", 1)
+			links = append(links, "https://www.20min.ch"+link)
+		}
+	}
+	return links
 }
 
-func htmlToText(html string, c chan Text) Text {
-	// TODO implement
-	return Text{}
+func htmlToText(url string, c chan Text) {
+	re := regexp.MustCompile(`<p class="content">.*<`)
+	html, err := getHtml(url)
+	if err != nil {
+		log.Print(err.Error())
+		return
+	}
+	commentStrings := re.FindAllString(html, -1)
+	for _, commentString := range commentStrings {
+		parts := strings.Split(commentString, ">")
+		if len(parts) == 2 {
+			comment := strings.Replace(parts[1], " <", "", -1)
+			comment = fmt.Sprintf("%q", comment)
+			comment = strings.Replace(comment, "\\xe4", "ä", -1)
+			comment = strings.Replace(comment, "\\xf6", "ö", -1)
+			comment = strings.Replace(comment, "\\xfc", "ü", -1)
+			comment = strings.Replace(comment, `\"`, `"`, -1)
+			comment = strings.Replace(comment, `"`, "", -1)
+			text := Text{Content: comment, URL: url}
+			c <- text
+		}
+	}
 }
 
 func save(text Text) {
@@ -111,7 +138,7 @@ func save(text Text) {
 	if os.Getenv("APP_ENV") == "prod" {
 		url = "" // TODO insert correct prod url
 	} else {
-		url = "http://localhost:5000"
+		url = "http://192.168.0.67:5000/submit"
 	}
 	textJson, _ := json.Marshal(text)
 	_, err := http.Post(url, "application/json", bytes.NewBuffer(textJson))
@@ -120,12 +147,11 @@ func save(text Text) {
 	}
 }
 
-func GetHtml(url string) (string, error) {
+func getHtml(url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err
 	}
-
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err

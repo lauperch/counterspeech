@@ -25,4 +25,4 @@ CMD if [ ${APP_ENV} = prod ]; \
 	fresh; \
 	fi
 	
-EXPOSE 8080
+EXPOSE 5000

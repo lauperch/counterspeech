@@ -26,8 +26,12 @@ type Text struct {
 
 func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	setCors(w)
+	session, err := database.Init()
+	defer session.Close()
+	texts = session.DB("app").C("texts")
+
 	result := []Text{}
-	err := texts.Find(nil).All(&result)
+	err = texts.Find(nil).All(&result)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -38,9 +42,13 @@ func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 func Random(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	setCors(w)
+	session, err := database.Init()
+	defer session.Close()
+	texts = session.DB("app").C("texts")
+
 	pipe := texts.Pipe([]bson.M{{"$sample": bson.M{"size": 1}}})
 	result := []bson.M{}
-	err := pipe.All(&result)
+	err = pipe.All(&result)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -50,6 +58,10 @@ func Random(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 func Submit(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	setCors(w)
+	session, _ := database.Init()
+	defer session.Close()
+	texts = session.DB("app").C("texts")
+
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responseError(w, err.Error(), http.StatusBadRequest)
@@ -73,8 +85,12 @@ func Submit(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 func Remove(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	setCors(w)
+	session, err := database.Init()
+	defer session.Close()
+	texts = session.DB("app").C("texts")
+
 	id := ps.ByName("id")
-	err := texts.Remove(bson.M{"_id": id})
+	err = texts.Remove(bson.M{"_id": id})
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -105,13 +121,13 @@ func responseError(w http.ResponseWriter, message string, code int) {
 }
 
 func main() {
-	session, err := database.Init()
-	defer session.Close()
-	texts = session.DB("app").C("texts")
-	if err != nil {
-		log.Println("connection to mongodb failed, aborting...")
-		log.Fatal(err)
-	}
+	//	session, err := database.Init()
+	//	defer session.Close()
+	//	texts = session.DB("app").C("texts")
+	//	if err != nil {
+	//		log.Println("connection to mongodb failed, aborting...")
+	//		log.Fatal(err)
+	//	}
 
 	log.Println("connected to mongodb")
 
@@ -128,5 +144,5 @@ func main() {
 		log.Println("Running api server in dev mode")
 	}
 
-	http.ListenAndServe(":8080", router)
+	http.ListenAndServe(":5000", router)
 }

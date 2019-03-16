@@ -102,10 +102,11 @@ class Classifier extends Component {
         <div className="header">
           <form className="submit" onSubmit={this.handleSubmit}>
             <p>{this.state.currentElement.content}</p>
+            { this.state.currentElement.url &&(<a href={this.state.currentElement.url} target="_blank">URL</a>)}
             <label><input type="radio" value="hsRadio" onChange={this.handleRadioChange} checked={this.state.currentRadio.value === "hsRadio"}/> i think it's hatespeech</label>
             <label><input type="radio" value="notHsRadio" onChange={this.handleRadioChange} checked={this.state.currentRadio.value === "notHsRadio"} /> i do not think it's hatespeech</label>
             <label><input type="radio" value="idkRadio" onChange={this.handleRadioChange} checked={this.state.currentRadio.value === "idkRadio"}/> i'm not sure</label>
-            <button type="submit"> Classify </button>
+            <button className="classifyButton" type="submit"> Classify </button>
           </form>
         </div>
       </div>
