@@ -1,4 +1,4 @@
-# Fancy Over-Engineered Go React App  (tm) 
+# Fancy Over-Engineered Go React Blockxhain AI Cloud App  (tm) 
 This app is still in developent, enjoy with care!
 At this point, it's not even clear what it should do.
 
