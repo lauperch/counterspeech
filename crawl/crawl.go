@@ -136,7 +136,7 @@ func htmlToText(url string, c chan Text) {
 func save(text Text) {
 	url := ""
 	if os.Getenv("APP_ENV") == "prod" {
-		url = "" // TODO insert correct prod url
+		url = "http://35.198.123.101:5000/submit"
 	} else {
 		url = "http://192.168.0.67:5000/submit"
 	}
