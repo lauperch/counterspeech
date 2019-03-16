@@ -9,7 +9,6 @@ class App extends Component {
       <div>
         <NavbarPage/>
         <div className="App">
-          <h1>#noHate</h1>
           <Display/>
         </div>
       </div>

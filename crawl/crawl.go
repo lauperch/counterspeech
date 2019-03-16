@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"regexp"
 	"strings"
 )
@@ -134,12 +133,7 @@ func htmlToText(url string, c chan Text) {
 }
 
 func save(text Text) {
-	url := ""
-	if os.Getenv("APP_ENV") == "prod" {
-		url = "http://35.198.123.101:5000/submit"
-	} else {
-		url = "http://192.168.0.67:5000/submit"
-	}
+	url := "http://35.198.123.101:5000/submit"
 	textJson, _ := json.Marshal(text)
 	_, err := http.Post(url, "application/json", bytes.NewBuffer(textJson))
 	if err != nil {
@@ -185,11 +179,6 @@ func main() {
 	router.GET("/status/:domain", Status)
 	router.GET("/run/:runDomain", Run)
 	router.GET("/stop/:stopDomain", Stop)
-	env := os.Getenv("APP_ENV")
-	if env == "prod" {
-		log.Println("Running api server in prod mode")
-	} else {
-		log.Println("Running api server in dev mode")
-	}
+	log.Println("Running api server in prod mode")
 	http.ListenAndServe(":3030", router)
 }

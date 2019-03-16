@@ -33,12 +33,7 @@ class Classifier extends Component {
     e.preventDefault();
     // sendtoapi
 
-    let url = ""
-    if (process.env.NODE_ENV === 'prod') {
-      url = 'http://35.198.123.101:5000/submit';
-    } else {
-      url = 'http://localhost:5000/submit';
-    }
+    let url = 'http://35.198.123.101:5000/submit';
 
     console.log("currentradio",this.state.currentRadio)
     
@@ -77,12 +72,7 @@ class Classifier extends Component {
   }
 
   loadNew = () => {
-    let url = ""
-    if (process.env.NODE_ENV === 'prod') {
-      url = 'http://35.198.123.101:5000/random';
-    } else {
-      url = 'http://localhost:5000/random';
-    }
+    let url = 'http://35.198.123.101:5000/random';
     fetch(url)
       .then(response => response.json())
       .then(data => {
@@ -101,7 +91,7 @@ class Classifier extends Component {
       <div className="reportForm">
         <div className="header">
           <form className="submit" onSubmit={this.handleSubmit}>
-            <p>{this.state.currentElement.content}</p>
+            <p className="reportText">{this.state.currentElement.content}</p>
             { this.state.currentElement.url &&(<a href={this.state.currentElement.url} target="_blank">URL</a>)}
             <label><input type="radio" value="hsRadio" onChange={this.handleRadioChange} checked={this.state.currentRadio.value === "hsRadio"}/> i think it's hatespeech</label>
             <label><input type="radio" value="notHsRadio" onChange={this.handleRadioChange} checked={this.state.currentRadio.value === "notHsRadio"} /> i do not think it's hatespeech</label>
