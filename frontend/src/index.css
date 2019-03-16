@@ -1,6 +1,6 @@
 body {
     padding: 50px;
-    background-color: #ff4949;
+    background-color:#a57b7b;
     font-family: sans-serif;
   }
   
@@ -22,18 +22,43 @@ body {
 
   label {
     color: white;
+    font-family: 'Roboto', sans-serif;
   }
   
   p {
     color: white;
+    font-family: 'Roboto', sans-serif;
   }
 
   a{
       color: white;
+      font-family: 'Roboto', sans-serif;
   }
 
   a:hover{
       color: white;
+      font-family: 'Roboto', sans-serif;
+  }
+
+     @media only screen and (min-width: 600px)  {
+	.reportText {
+	  width: 50%;
+	  margin-left: 25%;
+	}
+	textarea {
+	  width: 50%!important;
+	  margin-left:25%;
+	}
+     } 
+
+  .navbarBrand {
+      margin-left: 25%; 
+      font-family: 'Roboto', sans-serif;
+  }
+
+  .navbar-toggler {
+     width: auto;
+     margin-left: 40%; 
   }
   
   button{
@@ -42,7 +67,7 @@ body {
     background-color: #7e2323;
     border: 2px solid #ff4949;
     cursor: pointer;
-
+    margin-top: 10px;
   }
 
   

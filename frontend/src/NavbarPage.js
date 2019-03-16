@@ -15,7 +15,7 @@ toggleCollapse = () => {
 render() {
   return (
       <MDBNavbar color="indigo" dark expand="md">
-        <MDBNavbarBrand>
+        <MDBNavbarBrand className="navbarBrand">
           <strong className="white-text">CounterSpeech</strong>
         </MDBNavbarBrand>
         <MDBNavbarToggler onClick={this.toggleCollapse} />

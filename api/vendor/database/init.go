@@ -6,7 +6,6 @@ It does not contain actual business logic yet
 package database
 
 import (
-	"os"
 	"time"
 
 	"gopkg.in/mgo.v2"
@@ -22,11 +21,7 @@ type Post struct {
 
 func Init() (*mgo.Session, error) {
 	for i := 0; i < 5; i++ {
-		if os.Getenv("APP_ENV") == "prod" {
-			Session, err = mgo.Dial("10.156.0.3	:27017")
-		} else {
-			Session, err = mgo.Dial("mongo:27017")
-		}
+		Session, err = mgo.Dial("35.198.123.101:27017")
 		if err == nil {
 			break
 		}
